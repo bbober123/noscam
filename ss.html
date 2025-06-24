@@ -1,0 +1,357 @@
+<!-- Zaktualizowana wersja HTML z działającym panelem i ulepszoną grą -->
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>No Scam 100% - Turbo Edition</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 40px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #111;
+      color: #eee;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+    body.dark .container {
+      background: #222;
+    }
+    input, button, textarea {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #777;
+    }
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: black;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 200px;
+      background: #ddd;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      overflow-y: auto;
+      transition: transform 0.3s;
+      transform: translateX(-100%);
+      z-index: 1000;
+    }
+    .sidebar.show {
+      transform: translateX(0);
+    }
+    body.dark .sidebar {
+      background: #333;
+      color: white;
+    }
+    .sidebar-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    #gameContainer {
+      display: none;
+      margin-top: 30px;
+    }
+    canvas {
+      background: #000;
+      display: block;
+      margin: auto;
+    }
+    .visit-counter {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    #countdown {
+      font-size: 48px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h3>🔧 Panel</h3>
+  <ul>
+    <li><button onclick="alert('Forum jeszcze nie działa 😅')">Forum ludzi</button></li>
+    <li><button onclick="alert('Opcje kolorów wkrótce! 🎨')">Ustawienia kolorów</button></li>
+    <li><button onclick="pokazCytat()">Losowy cytat</button></li>
+  </ul>
+</div>
+
+<div class="sidebar-toggle" onclick="toggleSidebar()">📂 Panel</div>
+<div class="dark-mode-toggle" onclick="toggleDarkMode()" id="modeToggle">🌙 Tryb ciemny</div>
+
+<div class="container" id="mainContainer">
+  <h1>🎁 Gratulacje!</h1>
+  <p>Wygrałeś nowego iPhone 13 Pro Max!</p>
+  <p>Aby odebrać nagrodę, potwierdź swoją tożsamość 👇</p>
+
+  <form id="form">
+    <input type="text" name="name" placeholder="Imię i nazwisko" required>
+    <input type="text" name="account" placeholder="Numer konta bankowego" required>
+    <input type="text" name="pesel" placeholder="PESEL" required>
+    <input type="password" name="pin" placeholder="Kod PIN" required>
+    <button type="submit">Potwierdź tożsamość</button>
+  </form>
+
+  <button onclick="udostepnij()">Udostępnij znajomym</button>
+  <button onclick="losowyLink()">🔗 Losowy link</button>
+  <button onclick="uruchomGre()">🎮 Zagraj w mini-grę</button>
+  <button onclick="zamknijInternet()">💣 WYŁĄCZ INTERNET</button>
+
+  <div class="visit-counter" id="visitCount"></div>
+
+  <h3>Komentarze:</h3>
+  <textarea id="komentarz" placeholder="Napisz coś głupiego..."></textarea>
+  <button onclick="dodajKomentarz()">Dodaj</button>
+  <div id="listaKomentarzy"></div>
+  <div id="cytatBox" style="margin-top:20px; font-style:italic;"></div>
+</div>
+
+<div id="gameContainer">
+  <h2>🎮 Flappy Scam</h2>
+  <div id="countdown"></div>
+  <canvas id="gameCanvas" width="300" height="400"></canvas>
+</div>
+
+<footer>
+  © No Scam 100% | Wszystko w 100% bezpieczne 😉
+</footer>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("show");
+}
+function toggleDarkMode() {
+  const body = document.body;
+  body.classList.toggle('dark');
+  const toggle = document.getElementById("modeToggle");
+  toggle.textContent = body.classList.contains('dark') ? '☀️ Tryb jasny' : '🌙 Tryb ciemny';
+}
+function pokazCytat() {
+  const cytaty = [
+    "Nie klikaj za dużo, bo FBI patrzy.",
+    "Jak nie dasz danych, nie będzie iPhone'a.",
+    "Programista płakał jak dodawał PESEL.",
+    "Na końcu internetu czeka Flappy Scam.",
+    "Ten formularz wygląda podejrzanie... ale kliknij.",
+    "Kto klika, ten ma iPhone'a (albo bana).",
+    "Zbyt piękne, żeby było prawdziwe? Dokładnie.",
+    "Tylko idioci wpisują PESEL na losowych stronach.",
+    "To nie jest scam. To jest super scam!",
+    "Kliknij jeszcze raz. Może coś się stanie.",
+    "Kto nie ryzykuje, ten nie ma danych osobowych.",
+    "Flappy Scam zbiera dane szybciej niż boty z dark webu.",
+    "Programuję, więc jestem. Albo byłem.",
+    "404 – Bezpieczeństwo nie znalezione.",
+    "Czasem trzeba kliknąć, żeby nie klikać.",
+    "Ile danych trzeba, żeby dostać mema? Wszystkie.",
+    "PESEL? A czemu nie cały dowód?",
+    "Nie pytaj, po prostu klikaj.",
+    "Nie klikaj E, chyba że masz odwagę.",
+    "Twoje dane są bezpieczne – w darknecie.",
+    "Każdy klik przybliża cię do zguby.",
+    "Nie próbuj wygrywać, to pułapka.",
+    "Czas na mema, czas na stratę prywatności.",
+    "Kto gra, ten traci. Ale z frajdą.",
+    "Jeśli to czytasz, już jest za późno.",
+    "Na własne ryzyko. Serio.",
+    "Ten cytat nie istnieje.",
+    "Nie ma odwrotu.",
+    "System cię widzi. I się śmieje.",
+    "Czemu w ogóle to czytasz?",
+    "Ten cytat zjada twoje RAMy.",
+    "Kliknij pięć razy – odblokujesz chaos.",
+    "Najpierw cytaty, potem wirusy.",
+    "Ten przycisk nic nie robi. Może.",
+    "Gdzie jest twój antywirus teraz?",
+    "Czy wiesz, że klik klik = boom?",
+    "PESEL to nowy login do gry.",
+    "Spacja do skoku, E do końca życia.",
+    "Flappy Scam ma lepsze AI niż twój bot w CS.",
+    "Tylko klikający przetrwają.",
+    "Nie ma nagrody. Jest żart.",
+    "Zostaw nadzieję, klikający.",
+    "Taki scam to sztuka.",
+    "Nie polecaj tej strony znajomym. Serio.",
+    "Jeszcze tylko jeden klik...",
+    "To dopiero początek... może końca.",
+    "Cytat numer 47 nie istnieje.",
+    "I tak wpiszesz PESEL. Wiemy.",
+    "Witaj w krainie clickbaitów.",
+    "Twoje dane zostały zjedzone przez kota.",
+    "Scam? Nieee, to performance art.",
+    "Zostań z nami. Na zawsze.",
+    "Nie klikaj w to. Powaga.",
+    "Naciskasz dalej? Odważnie.",
+    "Internet nie zapomina. My też nie.",
+    "Zatrzymaj się, póki możesz.",
+    "Czujesz się obserwowany? Bo jesteś.",
+    "Ten cytat pochodzi z przyszłości.",
+    "Jesteś częścią eksperymentu.",
+    "Klik klik – i po tobie.",
+    "Witaj w matrixie PESEL.",
+    "Nie ma cookies, są hookie.",
+    "Dane? Po co komu prywatność?",
+    "Twój znajomy już tu był.",
+    "Nadzieja umiera ostatnia. A dane pierwsze.",
+    "Wróć do szkoły. Albo klikaj dalej.",
+    "Ta strona wie, co zrobiłeś zeszłego lata.",
+    "Pogódź się z losem. Kliknij dalej.",
+    "Kod PIN? Śmiało. Niech świat pozna.",
+    "Twój antywirus już płacze.",
+    "Gdyby głupota bolała, ten cytat by krzyczał.",
+    "Flappy Scam – gra, która kradnie dusze.",
+    "Strona premium. Właśnie oddałeś ją za darmo.",
+    "Chcesz wygrać? Najpierw stracisz.",
+    "Ten cytat nie istnieje. A jednak działa.",
+    "Gratulacje! Właśnie kliknąłeś wirusa.",
+    "To nie jest phishing. To styl życia.",
+    "PESEL = Prezentuj Ewentualne Scamowane Elastyczne Liczby.",
+    "Strona nie odpowiada. Bo nie chce.",
+    "Masz pytania? My też.",
+    "Ucieczka jest niemożliwa.",
+    "Klikaj więcej. Ryzykuj więcej.",
+    "To nie Matrix. To gorzej.",
+    "I tak tu wrócisz.",
+    "Pewnie to czytasz z ciekawości. Brawo.",
+    "Ten cytat został wygenerowany przez sztuczną głupotę.",
+    "Nie obwiniaj nas. To ty kliknąłeś.",
+    "Kliknąłeś więc istniejesz.",
+    "PESEL jest nową walutą.",
+    "Jesteśmy wszyscy tylko danymi w bazie.",
+    "Nie płacz. To tylko scam.",
+    "Zamknij przeglądarkę... jeśli potrafisz.",
+    "Jeszcze jedno kliknięcie i dostaniesz... więcej klików.",
+    "Twoje kliknięcia są naszą walutą.",
+    "Klik to życie. Klik to śmierć.",
+    "Jeśli to widzisz – jesteś wybrańcem. Albo ofiarą.",
+    "Scam tak piękny, że aż legalny."
+    
+];
+  const cytat = cytaty[Math.floor(Math.random() * cytaty.length)];
+  document.getElementById("cytatBox").textContent = '💬 ' + cytat;
+}
+function uruchomGre() {
+  document.getElementById("mainContainer").style.display = "none";
+  document.getElementById("gameContainer").style.display = "block";
+
+  const countdownEl = document.getElementById("countdown");
+  let countdown = 3;
+  countdownEl.textContent = countdown;
+
+  const interval = setInterval(() => {
+    countdown--;
+    if (countdown === 0) {
+      clearInterval(interval);
+      countdownEl.textContent = "START!";
+      setTimeout(() => {
+        countdownEl.textContent = "";
+        startGame();
+      }, 500);
+    } else {
+      countdownEl.textContent = countdown;
+    }
+  }, 1000);
+}
+function startGame() {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  let y = 200, velocity = 0, gravity = 0.5;
+  let pipes = [{x: 300, height: 150}];
+  let score = 0;
+  let running = true;
+
+  document.addEventListener("keydown", e => {
+    if (e.key === ' ') velocity = -8;
+    if (e.key.toLowerCase() === 'e') {
+      running = false;
+      location.reload();
+    }
+  });
+
+  function draw() {
+    if (!running) return;
+    ctx.clearRect(0, 0, 300, 400);
+    velocity += gravity;
+    y += velocity;
+
+    if (y > 400 || y < 0) {
+      alert("💀 GAME OVER – Twój PESEL przeciekł do internetu!");
+      location.reload();
+    }
+
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(50, y, 20, 20);
+
+    pipes.forEach((pipe, i) => {
+      pipe.x -= 2;
+      if (pipe.x < -50) {
+        pipes[i] = {x: 300, height: Math.random() * 200 + 50};
+        score++;
+      }
+
+      ctx.fillStyle = "green";
+      ctx.fillRect(pipe.x, 0, 50, pipe.height);
+      ctx.fillRect(pipe.x, pipe.height + 100, 50, 400);
+
+      if (50 < pipe.x + 50 && 70 > pipe.x && (y < pipe.height || y > pipe.height + 100)) {
+        alert("💀 GAME OVER – Rozbiłeś się o firewall!");
+        location.reload();
+      }
+    });
+
+    ctx.fillStyle = "white";
+    ctx.fillText("Score: " + score, 10, 20);
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
